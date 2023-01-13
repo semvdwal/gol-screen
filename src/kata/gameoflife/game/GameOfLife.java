@@ -77,6 +77,7 @@ public class GameOfLife {
     int dx = candidate.getColumn() - origin.getColumn();
     int dy = candidate.getRow() - origin.getRow();
 
+    if(origin.getRow() == candidate.getRow() && origin.getColumn() == candidate.getColumn()) return false;
     return dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1;
   }
 
