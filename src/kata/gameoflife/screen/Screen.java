@@ -9,7 +9,7 @@ public interface Screen {
 
   /**
    * Draws the given data on the raster
-   * @param data The data to draw
+   * @param data The data to draw, rows containing cells with integer values
    */
   void draw(List<List<Integer>> data);
 
