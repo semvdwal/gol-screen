@@ -26,6 +26,13 @@ public class WindowScreen extends JFrame implements Screen {
     this(title, 10, 10);
   }
 
+  /**
+   * Creates a screen with specified dimensions
+   * @param title The title of the window to create
+   * @param columns The number of rows to display
+   * @param rows The number of columns to display
+   * @throws HeadlessException When java is running in console mode (no access to window manager)
+   */
   public WindowScreen(String title, int columns, int rows) throws HeadlessException {
     this(title, columns, rows, new TileClickedListener() {
       @Override
