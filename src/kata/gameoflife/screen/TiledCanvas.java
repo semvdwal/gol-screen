@@ -58,6 +58,14 @@ class TiledCanvas extends Canvas {
     }
   }
 
+  int getRowNumber(int y) {
+    return (y - padding - lineWidth - padding) / (cellHeight() + padding);
+  }
+
+  int getColumnNumber(int x) {
+    return (x - padding - lineWidth - padding) / (cellWidth() + padding);
+  }
+
   @Override
   public void paint(Graphics g) {
     super.paint(g);
