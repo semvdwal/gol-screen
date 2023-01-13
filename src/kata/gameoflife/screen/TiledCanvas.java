@@ -3,11 +3,12 @@ package kata.gameoflife.screen;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Map;
 
 /**
  * This class draws the game of life on a canvas
  */
-public class GameOfLifeCanvas extends Canvas {
+class TiledCanvas extends Canvas {
 
   private int padding = 5;
   private int lineWidth = 5;
@@ -15,14 +16,16 @@ public class GameOfLifeCanvas extends Canvas {
   private int columns;
   private int rows;
 
-  int[][] buffer;
+  private int[][] buffer;
+
+  private Map<Integer, Color> colorMap;
 
   /**
    * Create a new canvas
    * @param columns The width in available cells to draw
    * @param rows The height in available cells to draw
    */
-  public GameOfLifeCanvas(int columns, int rows) {
+  TiledCanvas(int columns, int rows) {
     this.columns = columns;
     this.rows = rows;
 
@@ -36,32 +39,36 @@ public class GameOfLifeCanvas extends Canvas {
   }
 
   /**
+   * Set new color map to be used when drawing tiles
+   * @param colorMap
+   */
+  void setColorMap(Map<Integer, Color> colorMap) {
+    this.colorMap = colorMap;
+  }
+
+  /**
    * Set a new value for a single cell
    * @param column The column (x) position of the cell
    * @param row The row (y) position of the cell
    * @param value The value of the cell: 0 - EMPTY, -1 - DEAD, 1 - ALIVE
    */
-  public void setCell(int column, int row, int value) {
-    buffer[column][row] = value;
+  void setCell(int column, int row, int value) {
+    if(column < columns && row < rows) {
+      buffer[column][row] = value;
+    }
   }
 
   @Override
   public void paint(Graphics g) {
     super.paint(g);
-    System.out.println("paint");
     clear(g);
     drawBorder(g);
+    drawCells(g);
   }
 
   @Override
   public void update(Graphics g) {
     super.update(g);
-    System.out.println("update");
-    for (int c = 0; c < columns; c++) {
-      for (int r = 0; r < rows; r++) {
-        drawCell(g, c, r, buffer[c][r]);
-      }
-    }
   }
 
   private void clear(Graphics g) {
@@ -70,12 +77,21 @@ public class GameOfLifeCanvas extends Canvas {
     g.fillRect(0,0, getSize().width, getSize().height);
   }
 
+  private void drawCells(Graphics g) {
+    for (int c = 0; c < columns; c++) {
+      for (int r = 0; r < rows; r++) {
+        drawCell(g, c, r, buffer[c][r]);
+      }
+    }
+  }
+
   private void drawCell(Graphics g, int c, int r, int value) {
     int x = cellPosX(c);
     int y = cellPosY(r);
     // TODO: Investigate why these borders are acting weird
 //    drawBorder(g, x, y, x + cellWidth(), y + cellHeight(), 2, new Color(0, 0, 0, 100));
-    drawSquare(g, x + 2, y + 2, x + cellWidth() - 2, y + cellHeight() - 2, value < 0 ? Color.BLACK : value > 0 ? Color.GREEN : Color.WHITE);
+    Color color = colorMap.getOrDefault(value, Color.GRAY);
+    drawSquare(g, x + 2, y + 2, x + cellWidth() - 2, y + cellHeight() - 2, color);
   }
 
   private int cellPosX(int c) {

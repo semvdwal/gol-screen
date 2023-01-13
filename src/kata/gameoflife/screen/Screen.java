@@ -1,10 +1,16 @@
 package kata.gameoflife.screen;
 
 import java.util.List;
-import kata.gameoflife.Row;
 
+/**
+ * Represents a screen for displaying a game of life status
+ */
 public interface Screen {
 
-  void draw(List<Row> rows);
+  /**
+   * Draws the given data on the raster
+   * @param data The data to draw
+   */
+  void draw(List<List<Integer>> data);
 
 }
