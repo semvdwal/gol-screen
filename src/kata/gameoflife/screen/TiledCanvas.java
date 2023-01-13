@@ -10,8 +10,8 @@ import java.util.Map;
  */
 class TiledCanvas extends Canvas {
 
-  private int padding = 5;
-  private int lineWidth = 5;
+  private int padding = 1;
+  private int lineWidth = 2;
 
   private int columns;
   private int rows;
@@ -96,10 +96,8 @@ class TiledCanvas extends Canvas {
   private void drawCell(Graphics g, int c, int r, int value) {
     int x = cellPosX(c);
     int y = cellPosY(r);
-    // TODO: Investigate why these borders are acting weird
-//    drawBorder(g, x, y, x + cellWidth(), y + cellHeight(), 2, new Color(0, 0, 0, 100));
     Color color = colorMap.getOrDefault(value, Color.GRAY);
-    drawSquare(g, x + 2, y + 2, x + cellWidth() - 2, y + cellHeight() - 2, color);
+    drawSquare(g, x, y, x + cellWidth(), y + cellHeight(), color);
   }
 
   private int cellPosX(int c) {

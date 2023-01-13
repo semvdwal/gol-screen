@@ -1,12 +1,12 @@
 package kata.gameoflife.screen;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.HeadlessException;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 /**
@@ -15,7 +15,8 @@ import javax.swing.JFrame;
 public class WindowScreen extends JFrame implements Screen {
 
   private TiledCanvas canvas;
-  private TileClickedListener tileClickedListener;
+  private ScreenListener screenListener;
+  private CanvasMouseListener mouseListener;
 
   /**
    * Creates a new Window
@@ -34,10 +35,15 @@ public class WindowScreen extends JFrame implements Screen {
    * @throws HeadlessException When java is running in console mode (no access to window manager)
    */
   public WindowScreen(String title, int columns, int rows) throws HeadlessException {
-    this(title, columns, rows, new TileClickedListener() {
+    this(title, columns, rows, new ScreenListener() {
       @Override
-      public void onClicked(int row, int column) {
+      public void onTileClicked(int row, int column) {
         System.out.println("Tile clicked, row: " + row + ", column: " + column);
+      }
+
+      @Override
+      public void onStartStopClicked() {
+        System.out.println("Start / stop clicked");
       }
     });
   }
@@ -49,46 +55,35 @@ public class WindowScreen extends JFrame implements Screen {
    * @param rows The number of rows in the game
    * @throws HeadlessException When java is running in console mode (no access to window manager)
    */
-  public WindowScreen(String title, int columns, int rows, TileClickedListener tileClickedListener) throws HeadlessException {
+  public WindowScreen(String title, int columns, int rows, ScreenListener screenListener) throws HeadlessException {
     super(title);
+    this.screenListener = screenListener;
+
+    // Create and add canvas
     canvas = new TiledCanvas(columns, rows);
+    mouseListener = new CanvasMouseListener(this.screenListener, canvas);
+    canvas.addMouseListener(mouseListener);
     add(canvas);
+
+    // Create and add start / stop button
+    getContentPane().add(BorderLayout.SOUTH, createStartStopButton());
+
+    // Set window size and make visible
     setSize(600, 500);
     setVisible(true);
 
-    this.tileClickedListener = tileClickedListener;
-    canvas.addMouseListener(new MouseListener() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        tileClickedListener.onClicked(canvas.getRowNumber(e.getY()), canvas.getColumnNumber(e.getX()));
-      }
+    setColors(getDefaultColors());
+  }
 
-      @Override
-      public void mousePressed(MouseEvent e) {
-
-      }
-
-      @Override
-      public void mouseReleased(MouseEvent e) {
-
-      }
-
-      @Override
-      public void mouseEntered(MouseEvent e) {
-
-      }
-
-      @Override
-      public void mouseExited(MouseEvent e) {
-
-      }
-    });
-
-    Map<Integer, Color> defaultColors = new HashMap<>();
-    defaultColors.put(-1, Color.BLACK);
-    defaultColors.put(0, Color.WHITE);
-    defaultColors.put(1, Color.GREEN);
-    setColors(defaultColors);
+  /**
+   * Sets the screen listener
+   * @param listener A new screen listener
+   */
+  public void setScreenListener(ScreenListener listener) {
+    canvas.removeMouseListener(mouseListener);
+    screenListener = listener;
+    mouseListener = new CanvasMouseListener(this.screenListener, canvas);
+    canvas.addMouseListener(mouseListener);
   }
 
   /**
@@ -99,6 +94,10 @@ public class WindowScreen extends JFrame implements Screen {
     canvas.setColorMap(colors);
   }
 
+  /**
+   * Draws the given data on the raster, uses colors to represent data values
+   * @param data The data to draw, rows containing cells with integer values
+   */
   @Override
   public void draw(List<List<Integer>> data) {
 
@@ -110,6 +109,28 @@ public class WindowScreen extends JFrame implements Screen {
     }
     canvas.repaint();
 
+  }
+
+  private JButton createStartStopButton() {
+    JButton button = new JButton();
+    button.addActionListener(e -> {
+      screenListener.onStartStopClicked();
+      if (button.getText().equals("Start")) {
+        button.setText("Stop");
+      } else {
+        button.setText("Start");
+      }
+    });
+    button.setText("Start");
+    return button;
+  }
+
+  private Map<Integer, Color> getDefaultColors() {
+    Map<Integer, Color> defaultColors = new HashMap<>();
+    defaultColors.put(-1, Color.BLACK);
+    defaultColors.put(0, Color.WHITE);
+    defaultColors.put(1, Color.GREEN);
+    return defaultColors;
   }
 
 }
